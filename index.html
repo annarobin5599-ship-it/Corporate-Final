@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Present Value (PV) & Discounting Lab | Corporate Finance Interactive Academy</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- KaTeX for pristine LaTeX Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-black">
+
+  <!-- ========================================================================= -->
+  <!-- Top Application Header                                                    -->
+  <!-- ========================================================================= -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <i data-lucide="calculator" class="w-5 h-5 text-slate-950 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">Present Value & Discounting Lab</h1>
+            <span class="badge-pill bg-emerald-950 text-emerald-400 border border-emerald-500/30">Corporate Finance</span>
+          </div>
+          <p class="text-xs text-slate-400">Master Time Value of Money, Discount Factors & Capital Allocation</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- Currency Selector -->
+        <div class="flex items-center bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-300">
+          <span class="text-slate-400 mr-2 flex items-center"><i data-lucide="coins" class="w-3.5 h-3.5 mr-1"></i>Currency:</span>
+          <select id="globalCurrencySelect" class="bg-transparent font-semibold text-white focus:outline-none cursor-pointer">
+            <option value="₹" class="bg-slate-900 text-white">₹ INR (Rupee)</option>
+            <option value="$" class="bg-slate-900 text-white">$ USD (Dollar)</option>
+            <option value="€" class="bg-slate-900 text-white">€ EUR (Euro)</option>
+            <option value="£" class="bg-slate-900 text-white">£ GBP (Pound)</option>
+          </select>
+        </div>
+
+        <!-- Quick Preset Dropdown -->
+        <div class="hidden sm:flex items-center bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-300">
+          <span class="text-slate-400 mr-2 flex items-center"><i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1"></i>Preset:</span>
+          <select id="quickPresetSelect" class="bg-transparent text-emerald-400 font-medium focus:outline-none cursor-pointer">
+            <option value="default" class="bg-slate-900 text-white">₹50k @ 8% (3 Yrs) - Standard</option>
+            <option value="capbudget" class="bg-slate-900 text-white">$120k @ 10% (5 Yrs) - Project</option>
+            <option value="bond" class="bg-slate-900 text-white">₹1M @ 7.5% (5 Yrs) - Zero Bond</option>
+            <option value="salvage" class="bg-slate-900 text-white">$75k @ 8.5% Semi-Annual (6 Yrs)</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Tabs Bar -->
+    <div class="border-t border-slate-800/80 bg-slate-900/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 scrollbar-none" id="mainTabsNav">
+          <button data-tab="tab-learn" class="nav-tab-btn active px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center space-x-2 text-slate-300 hover:text-white border border-transparent">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>1. Learn Theory</span>
+          </button>
+          <button data-tab="tab-calculator" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center space-x-2 text-slate-300 hover:text-white border border-transparent">
+            <i data-lucide="calculator" class="w-4 h-4"></i>
+            <span>2. Calculator & Steps</span>
+          </button>
+          <button data-tab="tab-ai-solver" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center space-x-2 text-slate-300 hover:text-white border border-transparent">
+            <i data-lucide="bot" class="w-4 h-4 text-emerald-400"></i>
+            <span>3. AI Question Solver</span>
+          </button>
+          <button data-tab="tab-visualizer" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center space-x-2 text-slate-300 hover:text-white border border-transparent">
+            <i data-lucide="line-chart" class="w-4 h-4"></i>
+            <span>4. What-If Visualizer</span>
+          </button>
+          <button data-tab="tab-cases" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center space-x-2 text-slate-300 hover:text-white border border-transparent">
+            <i data-lucide="briefcase" class="w-4 h-4"></i>
+            <span>5. Corporate Cases</span>
+          </button>
+          <button data-tab="tab-quiz" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center space-x-2 text-slate-300 hover:text-white border border-transparent">
+            <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
+            <span>6. Practice Arena</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- Main Content Workspace                                                    -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ======================================================================= -->
+    <!-- TAB 1: LEARN (Theory & Foundations)                                     -->
+    <!-- ======================================================================= -->
+    <section id="tab-learn" class="tab-pane animate-fade-in space-y-6">
+      
+      <!-- Hero Banner -->
+      <div class="fintech-card glow-card p-6 sm:p-8 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/30">
+        <div class="max-w-3xl">
+          <span class="badge-pill bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 mb-3">Core Financial Axiom</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            "A Rupee Today is Worth More than a Rupee Tomorrow"
+          </h2>
+          <p class="mt-3 text-slate-300 text-sm sm:text-base leading-relaxed">
+            In corporate finance, money has a <strong>time value</strong>. A future sum of money cannot be compared 
+            directly to cash today without converting it into its equivalent present worth through the process of 
+            <span class="text-emerald-400 font-semibold">Discounting</span>.
+          </p>
+        </div>
+      </div>
+
+      <!-- The 3 Pillars of TVM -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="fintech-card p-5 bg-slate-900/60 border border-slate-800 hover:border-slate-700">
+          <div class="w-9 h-9 rounded-lg bg-amber-950/80 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-3.5">
+            <i data-lucide="trending-down" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">1. Purchasing Power (Inflation)</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Due to ongoing general price inflation, ₹100 in 5 years will buy significantly fewer goods and services than ₹100 does today. Future purchasing power is diminished.
+          </p>
+        </div>
+
+        <div class="fintech-card p-5 bg-slate-900/60 border border-slate-800 hover:border-slate-700">
+          <div class="w-9 h-9 rounded-lg bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-3.5">
+            <i data-lucide="percent" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">2. Opportunity Cost of Capital</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Having cash today allows you to invest it in risk-free government securities, stocks, or projects to earn a positive return \(r\). Waiting for cash foregoes this earning potential.
+          </p>
+        </div>
+
+        <div class="fintech-card p-5 bg-slate-900/60 border border-slate-800 hover:border-slate-700">
+          <div class="w-9 h-9 rounded-lg bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-3.5">
+            <i data-lucide="shield-alert" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">3. Default & Uncertainty Risk</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            The further into the future a cash flow is expected, the greater the uncertainty that the counterparty or market will actually deliver it. Investors demand a risk premium.
+          </p>
+        </div>
+      </div>
+
+      <!-- Compounding vs Discounting Visual Comparison -->
+      <div class="fintech-card p-6 bg-slate-900/80">
+        <h3 class="text-lg font-bold text-white flex items-center space-x-2 mb-4">
+          <i data-lucide="arrow-left-right" class="w-5 h-5 text-emerald-400"></i>
+          <span>Compounding vs. Discounting: Two Sides of the Same Coin</span>
+        </h3>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+          
+          <!-- Compounding Box -->
+          <div class="p-5 rounded-xl bg-slate-800/60 border border-slate-700">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-blue-400 text-sm flex items-center">
+                <i data-lucide="arrow-right" class="w-4 h-4 mr-1"></i> Compounding (Moving Forward)
+              </span>
+              <span class="text-[11px] text-slate-400">Today &rarr; Future</span>
+            </div>
+            <p class="text-xs text-slate-300 mb-3">
+              Takes money you have <strong>today (PV)</strong> and grows it forward into the future by accumulating compound interest at rate \(r\):
+            </p>
+            <div class="p-3 bg-slate-900 rounded-lg text-center font-mono text-sm text-blue-300">
+              $$FV = PV \times (1 + r)^n$$
+            </div>
+          </div>
+
+          <!-- Discounting Box -->
+          <div class="p-5 rounded-xl bg-slate-800/60 border border-emerald-700/60 bg-emerald-950/10">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-emerald-400 text-sm flex items-center">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Discounting (Bringing Back)
+              </span>
+              <span class="text-[11px] text-slate-400">Future &rarr; Today</span>
+            </div>
+            <p class="text-xs text-slate-300 mb-3">
+              Takes an expected <strong>future cash receipt (FV)</strong> and strips out time and risk to discover what it is worth in hand <strong>today (PV)</strong>:
+            </p>
+            <div class="p-3 bg-slate-900 rounded-lg text-center font-mono text-sm text-emerald-300">
+              $$PV = \frac{FV}{(1 + r)^n} = FV \times (1 + r)^{-n}$$
+            </div>
+          </div>
+
+        </div>
+
+        <!-- The Discount Factor Explained -->
+        <div class="mt-6 p-4 rounded-xl bg-slate-900 border border-slate-800">
+          <h4 class="text-sm font-bold text-white mb-2 flex items-center">
+            <i data-lucide="zap" class="w-4 h-4 text-amber-400 mr-2"></i>
+            What is the "Discount Factor" (DF)?
+          </h4>
+          <p class="text-xs text-slate-300 leading-relaxed mb-2">
+            The expression \(\frac{1}{(1 + r)^n}\) is known as the <strong>Discount Factor (DF)</strong>. 
+            It represents the exact present worth of <strong>one single unit of currency (₹1 or $1)</strong> received \(n\) years in the future.
+          </p>
+          <div class="text-xs text-emerald-400 font-medium">
+            &bull; As discount rate \(r\) rises &rarr; DF drops &rarr; PV drops.<br>
+            &bull; As time period \(n\) extends &rarr; DF drops &rarr; PV drops.
+          </div>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+          <button data-switch-to="tab-calculator" class="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs sm:text-sm flex items-center space-x-2 transition shadow-lg shadow-emerald-600/20">
+            <span>Try the Calculator & Step-by-Step Solver</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 2: CALCULATOR & STEP-BY-STEP SOLUTION                               -->
+    <!-- ======================================================================= -->
+    <section id="tab-calculator" class="tab-pane hidden animate-fade-in space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Inputs Form -->
+        <div class="lg:col-span-5 fintech-card p-6 space-y-5">
+          <div class="border-b border-slate-800 pb-3">
+            <h2 class="text-lg font-bold text-white flex items-center">
+              <i data-lucide="sliders" class="w-5 h-5 text-emerald-400 mr-2"></i>
+              Financial Input Parameters
+            </h2>
+            <p class="text-xs text-slate-400">Specify the parameters of your future cash flow</p>
+          </div>
+
+          <!-- Future Value (FV) -->
+          <div>
+            <label for="inputFV" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex justify-between">
+              <span>Future Cash Flow (FV)</span>
+              <span class="text-slate-400 lowercase font-normal">nominal amount</span>
+            </label>
+            <div class="relative rounded-lg shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <span class="text-emerald-400 font-bold text-sm" id="fvCurrencyLabel">₹</span>
+              </div>
+              <input type="number" id="inputFV" value="50000" min="0" step="1000" 
+                     class="block w-full pl-8 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Expected nominal cash receipt at period \(n\)</p>
+          </div>
+
+          <!-- Discount Rate (r) -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="inputRate" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Discount Rate / Cost of Capital (r)
+              </label>
+              <span class="font-mono text-xs font-bold text-emerald-400" id="rateValueDisplay">8.0%</span>
+            </div>
+            <div class="relative rounded-lg shadow-sm">
+              <input type="number" id="inputRate" value="8.0" min="0" max="100" step="0.25" 
+                     class="block w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Required rate of return, WACC, or hurdle rate per year</p>
+          </div>
+
+          <!-- Number of Periods / Years (n) -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="inputPeriods" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Number of Periods / Years (n)
+              </label>
+              <span class="font-mono text-xs font-bold text-emerald-400" id="periodValueDisplay">3 Years</span>
+            </div>
+            <div class="relative rounded-lg shadow-sm">
+              <input type="number" id="inputPeriods" value="3" min="0.1" max="50" step="0.5" 
+                     class="block w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Duration of time until the cash flow is received</p>
+          </div>
+
+          <!-- Compounding / Discounting Frequency -->
+          <div>
+            <label for="inputCompounding" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Compounding Frequency (m)
+            </label>
+            <select id="inputCompounding" class="block w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs font-medium focus:ring-2 focus:ring-emerald-500 focus:border-transparent cursor-pointer">
+              <option value="1" selected>Annual (m = 1) - Standard in Corporate Finance</option>
+              <option value="2">Semi-Annual (m = 2) - Standard for Corporate Bonds</option>
+              <option value="4">Quarterly (m = 4) - Commercial Leases & Loans</option>
+              <option value="12">Monthly (m = 12) - Retail & Annuity Cash Flows</option>
+              <option value="continuous">Continuous Discounting (e^-rn)</option>
+            </select>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-2 flex flex-col sm:flex-row gap-2">
+            <button id="btnRecalculate" class="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs sm:text-sm rounded-lg transition flex items-center justify-center space-x-1.5 shadow-lg shadow-emerald-600/20">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              <span>Recalculate PV</span>
+            </button>
+            <button id="btnCopySolution" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center justify-center space-x-1" title="Copy formatted solution to clipboard">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Copy</span>
+            </button>
+            <button id="btnPrintSolution" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center justify-center space-x-1" title="Print student report">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Print</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Results & Step-by-Step Breakdown -->
+        <div class="lg:col-span-7 space-y-5">
+          
+          <!-- Primary Key Metric Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Present Value Card -->
+            <div class="fintech-card glow-card p-5 bg-gradient-to-br from-slate-900 to-emerald-950/40 border-emerald-500/40">
+              <div class="flex items-center justify-between text-xs text-slate-400 uppercase tracking-wider mb-1">
+                <span>Present Value (PV)</span>
+                <span class="badge-pill bg-emerald-950 text-emerald-400 border border-emerald-500/30">Value Today</span>
+              </div>
+              <div class="text-3xl font-extrabold text-emerald-400 font-mono tracking-tight" id="metricPV">
+                ₹39,691.61
+              </div>
+              <div class="text-xs text-slate-400 mt-2 flex items-center">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400 mr-1"></i>
+                <span id="metricRetentionLabel">79.4% of future value preserved</span>
+              </div>
+            </div>
+
+            <!-- Discount Amount Card -->
+            <div class="fintech-card p-5 bg-gradient-to-br from-slate-900 to-rose-950/30 border-slate-800">
+              <div class="flex items-center justify-between text-xs text-slate-400 uppercase tracking-wider mb-1">
+                <span>Total Discount</span>
+                <span class="badge-pill bg-rose-950 text-rose-400 border border-rose-500/30">Value Lost</span>
+              </div>
+              <div class="text-3xl font-extrabold text-rose-400 font-mono tracking-tight" id="metricDiscount">
+                ₹10,308.39
+              </div>
+              <div class="text-xs text-slate-400 mt-2 flex items-center">
+                <i data-lucide="trending-down" class="w-3.5 h-3.5 text-rose-400 mr-1"></i>
+                <span id="metricErosionLabel">20.6% lost to time & cost of capital</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Secondary Metric Pills (Discount Factor, EAR) -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-800 flex items-center justify-between">
+              <div>
+                <div class="text-[11px] text-slate-400 font-medium">Discount Factor (DF):</div>
+                <div class="text-sm font-bold font-mono text-white" id="metricDF">0.793832</div>
+              </div>
+              <div class="text-[10px] text-slate-500 text-right">₹1 in future = ₹DF today</div>
+            </div>
+            <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-800 flex items-center justify-between">
+              <div>
+                <div class="text-[11px] text-slate-400 font-medium">Effective Annual Rate:</div>
+                <div class="text-sm font-bold font-mono text-white" id="metricEAR">8.00%</div>
+              </div>
+              <div class="text-[10px] text-slate-500 text-right">True compounding yield</div>
+            </div>
+          </div>
+
+          <!-- Progress Bar Breakdown -->
+          <div id="calculatorBreakdownContainer"></div>
+
+          <!-- Step-by-Step Pedagogical Accordion -->
+          <div class="fintech-card p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 class="text-base font-bold text-white flex items-center">
+                <i data-lucide="layers" class="w-5 h-5 text-indigo-400 mr-2"></i>
+                Step-by-Step Learning Breakdown
+              </h3>
+              <span class="text-xs text-slate-400">Undergraduate Finance Pedagogy</span>
+            </div>
+
+            <!-- Dynamic Steps Container -->
+            <div id="stepsAccordionContainer" class="space-y-4"></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 3: AI NATURAL LANGUAGE QUESTION SOLVER                             -->
+    <!-- ======================================================================= -->
+    <section id="tab-ai-solver" class="tab-pane hidden animate-fade-in space-y-6">
+      
+      <!-- AI Tutor Intro Header -->
+      <div class="fintech-card p-6 bg-gradient-to-r from-slate-900 via-emerald-950/20 to-slate-900 border-emerald-500/30">
+        <div class="flex items-start space-x-4">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20">
+            <i data-lucide="bot" class="w-6 h-6 text-slate-950 stroke-[2.5]"></i>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center space-x-2">
+              <h2 class="text-xl font-bold text-white">AI Corporate Finance Tutor & Problem Solver</h2>
+              <span class="badge-pill bg-emerald-900/60 text-emerald-300 border border-emerald-500/40">NLP Enabled</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1">
+              Enter any homework word problem or finance question in natural language. The AI parses the parameters, identifies the underlying financial mechanics, performs the exact step-by-step math, and explains the managerial takeaway.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Problem Input Form -->
+      <div class="fintech-card p-6 space-y-4">
+        
+        <div>
+          <label for="aiQuestionInput" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            Ask Your Question / Paste Your Problem Statement:
+          </label>
+          <div class="relative">
+            <textarea id="aiQuestionInput" rows="3" 
+                      placeholder="e.g. I will receive ₹50,000 after 3 years and the discount rate is 8%. What is its present value?" 
+                      class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition leading-relaxed"></textarea>
+          </div>
+        </div>
+
+        <!-- Sample Question Chips -->
+        <div>
+          <div class="text-xs text-slate-400 font-medium mb-2 flex items-center">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400 mr-1.5"></i>
+            Click a sample question to test:
+          </div>
+          <div class="flex flex-wrap gap-2" id="sampleQuestionsChips"></div>
+        </div>
+
+        <!-- Solve Action Button -->
+        <div class="flex justify-end pt-2">
+          <button id="btnSolveAI" class="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-extrabold text-sm rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center space-x-2">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Solve & Explain Step-by-Step</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- AI Response Output Container -->
+      <div id="aiResponseContainer" class="hidden fintech-card p-6 space-y-6 border-emerald-500/40"></div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 4: WHAT-IF SENSITIVITY VISUALIZER                                   -->
+    <!-- ======================================================================= -->
+    <section id="tab-visualizer" class="tab-pane hidden animate-fade-in space-y-6">
+      
+      <!-- Visualizer Header & Sliders -->
+      <div class="fintech-card p-6 space-y-6">
+        <div class="border-b border-slate-800 pb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center">
+              <i data-lucide="sliders-horizontal" class="w-5 h-5 text-indigo-400 mr-2"></i>
+              What-If Analysis & Sensitivity Studio
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Drag the sliders below to observe how Present Value responds instantly to changes in rate and time.
+            </p>
+          </div>
+          <div class="badge-pill bg-indigo-950 text-indigo-300 border border-indigo-500/30">
+            Real-Time Kinetic Math
+          </div>
+        </div>
+
+        <!-- Dual Sliders Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl bg-slate-900 border border-slate-800">
+          
+          <!-- Slider 1: Discount Rate (r) -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label for="sliderRate" class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center">
+                <i data-lucide="percent" class="w-3.5 h-3.5 text-emerald-400 mr-1.5"></i>
+                Discount Rate (r):
+              </label>
+              <span class="font-mono text-sm font-extrabold text-emerald-400" id="sliderRateLabel">8.0%</span>
+            </div>
+            <input type="range" id="sliderRate" min="0" max="30" step="0.5" value="8" class="w-full">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+              <span>0% (No discount)</span>
+              <span>15% (Typical WACC)</span>
+              <span>30% (High risk)</span>
+            </div>
+          </div>
+
+          <!-- Slider 2: Time Horizon (n) -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label for="sliderYears" class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center">
+                <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400 mr-1.5"></i>
+                Time Period (n):
+              </label>
+              <span class="font-mono text-sm font-extrabold text-indigo-400" id="sliderYearsLabel">3 Years</span>
+            </div>
+            <input type="range" id="sliderYears" min="1" max="30" step="1" value="3" class="w-full">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+              <span>1 Year (Short)</span>
+              <span>15 Years (Medium)</span>
+              <span>30 Years (Long bond)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Live KPI Badges -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
+            <div class="text-[11px] text-slate-400">Future Cash Flow:</div>
+            <div class="text-base font-bold text-white font-mono" id="sliderFvDisplay">₹50,000</div>
+          </div>
+          <div class="p-3 bg-slate-900/60 rounded-lg border border-emerald-500/30">
+            <div class="text-[11px] text-emerald-400">Instant Present Value:</div>
+            <div class="text-base font-extrabold text-emerald-400 font-mono" id="sliderPvDisplay">₹39,691.61</div>
+          </div>
+          <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
+            <div class="text-[11px] text-slate-400">Discount Factor:</div>
+            <div class="text-base font-bold text-indigo-300 font-mono" id="sliderDfDisplay">0.7938</div>
+          </div>
+          <div class="p-3 bg-slate-900/60 rounded-lg border border-rose-500/30">
+            <div class="text-[11px] text-rose-400">Discount Loss:</div>
+            <div class="text-base font-bold text-rose-400 font-mono" id="sliderLossDisplay">20.6%</div>
+          </div>
+        </div>
+
+        <!-- Interactive Visual Breakdown Bar -->
+        <div id="visualizerBreakdownContainer"></div>
+
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Chart 1: Time Decay Curve -->
+        <div class="fintech-card p-5 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center">
+                <i data-lucide="trending-down" class="w-4 h-4 text-emerald-400 mr-1.5"></i>
+                Time-Decay Curve: PV over Years (n)
+              </h3>
+              <p class="text-[11px] text-slate-400">Demonstrates exponential erosion as time extends</p>
+            </div>
+            <span class="text-[11px] text-slate-400 font-mono">0 &rarr; 20 Yrs</span>
+          </div>
+          <div class="h-72 w-full relative">
+            <canvas id="decayChartCanvas"></canvas>
+          </div>
+          <p class="text-[11px] text-slate-400 italic">
+            * Notice how the higher benchmark curves (amber/purple) decay much more sharply than lower rate curves.
+          </p>
+        </div>
+
+        <!-- Chart 2: Rate Sensitivity Curve -->
+        <div class="fintech-card p-5 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center">
+                <i data-lucide="activity" class="w-4 h-4 text-indigo-400 mr-1.5"></i>
+                Hurdle Rate Sensitivity Curve: PV vs. Rate (r)
+              </h3>
+              <p class="text-[11px] text-slate-400">Demonstrates non-linear convexity of present value</p>
+            </div>
+            <span class="text-[11px] text-slate-400 font-mono">0% &rarr; 25%</span>
+          </div>
+          <div class="h-72 w-full relative">
+            <canvas id="rateSensitivityChartCanvas"></canvas>
+          </div>
+          <p class="text-[11px] text-slate-400 italic">
+            * The curve is convex: an initial 1% increase in discount rate creates a bigger drop in value than a subsequent 1% increase.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- 2D Sensitivity Matrix Heatmap -->
+      <div class="fintech-card p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center">
+              <i data-lucide="grid" class="w-5 h-5 text-emerald-400 mr-2"></i>
+              2D Corporate Finance Sensitivity Matrix (Heatmap)
+            </h3>
+            <p class="text-xs text-slate-400">
+              Cross-tabulation of required return (rows) vs time horizon (columns). Green cells preserve value; red cells suffer severe erosion.
+            </p>
+          </div>
+          <span class="badge-pill bg-slate-800 text-slate-300 border border-slate-700">Interactive Grid</span>
+        </div>
+
+        <div id="sensitivityMatrixContainer"></div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 5: CORPORATE FINANCE CASE STUDIES                                   -->
+    <!-- ======================================================================= -->
+    <section id="tab-cases" class="tab-pane hidden animate-fade-in space-y-6">
+      
+      <!-- Cases Header -->
+      <div class="fintech-card p-6 bg-gradient-to-r from-slate-900 via-indigo-950/20 to-slate-900 border-indigo-500/30">
+        <div class="flex items-start space-x-4">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="briefcase" class="w-6 h-6 text-indigo-400"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white">Corporate Finance Decision Lab</h2>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1">
+              Explore four practical real-world corporate finance scenarios. You can modify any company variable, calculate the discounted outcome, review the CFO's decision rule, or load the values directly into the main visualizer.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Cases List -->
+      <div id="casesListContainer" class="space-y-6"></div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 6: PRACTICE ARENA & QUIZ                                            -->
+    <!-- ======================================================================= -->
+    <section id="tab-quiz" class="tab-pane hidden animate-fade-in space-y-6">
+      
+      <!-- Quiz Header & Scoreboard -->
+      <div class="fintech-card p-6 bg-gradient-to-br from-slate-900 to-amber-950/20 border-amber-500/30">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+              <i data-lucide="award" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Corporate Finance Mastery Quiz</h2>
+              <p class="text-xs text-slate-400">Test your conceptual intuition and mathematical agility</p>
+            </div>
+          </div>
+
+          <!-- Scoreboard Badges -->
+          <div class="flex items-center space-x-3 text-xs font-mono">
+            <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+              <span class="text-slate-400">Score:</span>
+              <span class="font-bold text-emerald-400 ml-1" id="quizScoreDisplay">0 / 0</span>
+            </div>
+            <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+              <span class="text-slate-400">Streak:</span>
+              <span class="font-bold text-amber-400 ml-1" id="quizStreakDisplay">0 🔥</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Quiz Card Container -->
+      <div class="fintech-card p-6 space-y-5" id="activeQuizCard">
+        
+        <!-- Question Header Meta -->
+        <div class="flex justify-between items-center text-xs">
+          <span class="badge-pill bg-indigo-950 text-indigo-300 border border-indigo-500/30" id="quizQuestionCategory">
+            Concept & Intuition
+          </span>
+          <span class="text-slate-400" id="quizQuestionCounter">Question 1 of 5</span>
+        </div>
+
+        <!-- Question Title -->
+        <h3 class="text-base sm:text-lg font-bold text-white leading-relaxed" id="quizQuestionText">
+          Loading question...
+        </h3>
+
+        <!-- Options Container -->
+        <div class="space-y-3" id="quizOptionsContainer"></div>
+
+        <!-- Hint Accordion -->
+        <div class="border-t border-slate-800/80 pt-3">
+          <button id="btnToggleHint" class="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center space-x-1.5 transition">
+            <i data-lucide="help-circle" class="w-4 h-4"></i>
+            <span>Need a Hint?</span>
+          </button>
+          <div id="quizHintBox" class="hidden mt-2 p-3 rounded-lg bg-amber-950/20 border border-amber-500/30 text-xs text-amber-200/90 leading-relaxed"></div>
+        </div>
+
+        <!-- Explanation & Feedback Box (hidden until answered) -->
+        <div id="quizFeedbackBox" class="hidden p-4 rounded-xl border"></div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between items-center pt-2">
+          <button id="btnNewDynamicProblem" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium flex items-center space-x-1.5 transition">
+            <i data-lucide="dice-5" class="w-4 h-4 text-emerald-400"></i>
+            <span>Generate New Random Problem</span>
+          </button>
+          <button id="btnNextQuestion" class="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs sm:text-sm flex items-center space-x-1.5 transition">
+            <span>Next Question</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- Footer                                                                    -->
+  <!-- ========================================================================= -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-6 mt-12 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="font-medium text-slate-400">
+        Corporate Finance Present Value & Discounting Educational Interactive Suite
+      </p>
+      <p class="mt-1 text-[11px] text-slate-600">
+        Designed for commerce, finance, and accounting undergraduate students. Built with HTML5, Chart.js & KaTeX.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/pv-engine.js"></script>
+  <script src="js/ai-solver.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/cases.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
